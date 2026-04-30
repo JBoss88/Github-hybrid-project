@@ -2,7 +2,6 @@ import pytest
 from config.env_data import GITHUB_API_BASE_URL, GITHUB_PAT
 from api_clients.github_api import GithubAPI
 import time
-# from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from playwright.sync_api import Page
 
@@ -18,15 +17,6 @@ def api_client():
     return GithubAPI(base_url=GITHUB_API_BASE_URL, token=GITHUB_PAT)
 
 
-# --- 2. Page Object Initialization ---
-
-# @pytest.fixture
-# def login_page(page: Page) -> LoginPage:
-#     """
-#     Takes Playwright's built-in 'page' fixture and wraps it in our custom LoginPage object.
-#     """
-#     return LoginPage(page)
-
 @pytest.fixture
 def dashboard_page(page: Page) -> DashboardPage:
     """
@@ -35,7 +25,7 @@ def dashboard_page(page: Page) -> DashboardPage:
     return DashboardPage(page)
 
 
-# --- 3. The Lifecycle Fixture (The Hybrid Magic) ---
+# --- 2. The Lifecycle Fixture (The Hybrid Magic) ---
 
 @pytest.fixture
 def test_repository(api_client: GithubAPI):

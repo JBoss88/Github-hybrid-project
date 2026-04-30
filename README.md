@@ -9,10 +9,11 @@ A hybrid test automation framework that combines **REST API testing** and **Play
 The core idea is the `test_repository` fixture in `conftest.py`:
 
 1. **API Setup** — Creates a private GitHub repo instantly via the GitHub REST API
-2. **UI Test** — Playwright logs into GitHub and verifies the new repo appears on the dashboard
-3. **API Teardown** — Deletes the repo via API after the test completes, pass or fail
+2. **Session Injection** — Playwright skips the login flow entirely by loading a pre-saved `auth.json` browser state, dropping directly onto the authenticated dashboard
+3. **UI Test** — Verifies the new repo appears on the dashboard
+4. **API Teardown** — Deletes the repo via API after the test completes, pass or fail
 
-This pattern keeps tests fast and stateless without relying on pre-existing test data.
+This pattern keeps tests fast and stateless without relying on pre-existing test data or slow UI login flows.
 
 ---
 
@@ -20,21 +21,24 @@ This pattern keeps tests fast and stateless without relying on pre-existing test
 
 ```
 ├── api_clients/
-│   ├── base_client.py       # Generic HTTP client (requests wrapper)
-│   └── github_api.py        # GitHub-specific API methods
+│   ├── base_client.py          # Generic HTTP client (requests wrapper)
+│   └── github_api.py           # GitHub-specific API methods
 ├── config/
-│   ├── env_data.py          # Loads env vars and base URLs
-│   └── tests/
-│       └── test_repo_lifecycle.py  # Main hybrid E2E test
+│   └── env_data.py             # Loads env vars and base URLs
 ├── models/
-│   └── repo_model.py        # Pydantic model for API response validation
+│   └── repo_model.py           # Pydantic model for API response validation
 ├── pages/
-│   ├── base_page.py         # Base Page Object with shared Playwright helpers
-│   ├── login_page.py        # GitHub login page interactions
-│   └── dashboard_page.py    # GitHub dashboard page interactions
-├── conftest.py              # Pytest fixtures (API client, page objects, lifecycle)
+│   ├── base_page.py            # Base Page Object with shared Playwright helpers
+│   └── dashboard_page.py       # GitHub dashboard page interactions
+├── tests/
+│   └── test_repo_lifecycle.py  # Main hybrid E2E test
+├── .github/
+│   └── workflows/
+│       └── test_execution.yml  # GitHub Actions CI pipeline
+├── conftest.py                 # Pytest fixtures (API client, page objects, lifecycle)
+├── generate_auth.py            # One-time script to capture and save browser auth state
 ├── requirements.txt
-└── .env                     # Not committed — see setup below
+└── .env                        # Not committed — see setup below
 ```
 
 ---
@@ -60,10 +64,20 @@ playwright install chromium
 Create a `.env` file in the project root:
 ```
 GITHUB_TOKEN=your_personal_access_token
+GITHUB_USERNAME=your_github_username
 GITHUB_PASSWORD=your_github_password
 ```
 
 The PAT requires `repo` scope to create and delete repositories.
+
+**4. Generate auth state (one-time)**
+
+Run this once to capture your authenticated browser session:
+```bash
+python generate_auth.py
+```
+
+This opens a headed browser, logs into GitHub, and saves the session cookies to `auth.json`. If GitHub prompts for 2FA, complete it manually within the 60-second window. The resulting `auth.json` is used by all subsequent test runs to skip the login flow entirely.
 
 ---
 
@@ -75,7 +89,27 @@ pytest
 
 # Run with visible browser
 pytest --headed
+
+# Run with verbose output
+pytest -v -s
 ```
+
+---
+
+## CI/CD
+
+The GitHub Actions workflow (`.github/workflows/test_execution.yml`) runs on every push and pull request to `main`, and can also be triggered manually from the Actions tab.
+
+The pipeline requires three repository secrets:
+
+| Secret | Description |
+|---|---|
+| `GH_TOKEN` | GitHub PAT with `repo` scope |
+| `GH_USERNAME` | GitHub username |
+| `GH_PASSWORD` | GitHub password |
+| `AUTH_JSON_DATA` | Contents of your local `auth.json` file |
+
+Playwright screenshots are captured on test failure and uploaded as a downloadable artifact named `playwright-failure-screenshots`.
 
 ---
 

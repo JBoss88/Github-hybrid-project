@@ -1,0 +1,19 @@
+# Environment
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Testing
+.pytest_cache/
+allure-results/
+allure-report/
+
+# macOS
+.DS_Store

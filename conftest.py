@@ -57,3 +57,14 @@ def test_repository(api_client: GithubAPI):
     # TEARDOWN: The UI test finished. Clean up the database!
     print(f"\n[TEARDOWN] Deleting test repository: {unique_repo_name}")
     api_client.delete_repo(unique_repo_name)
+
+import pytest
+
+# This automatically intercepts Playwright before it opens a browser
+# and injects our VIP wristband into the session.
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "storage_state": "auth.json",
+    }

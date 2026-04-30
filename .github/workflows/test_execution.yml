@@ -42,7 +42,7 @@ jobs:
       env: 
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_PASSWORD: ${{ secrets.GH_PASSWORD }}
-        GITHUB_PAT: ${{ secrets.GH__TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_TOKEN }}
       run: pytest -v -s --screenshot=only-on-failure
 
     # This new step tells GitHub to save the screenshot so you can download it!

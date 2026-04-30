@@ -40,9 +40,9 @@ jobs:
     - name: Run Pytest Test Suite
       # We map your GitHub Secrets to the environment variables your code expects
       env: 
-        GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
-        GITHUB_PASSWORD: ${{ secrets.GITHUB_PASSWORD }}
-        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_PASSWORD: ${{ secrets.GH_PASSWORD }}
+        GITHUB_PAT: ${{ secrets.GH__TOKEN }}
       run: pytest -v -s --screenshot=only-on-failure
 
     # This new step tells GitHub to save the screenshot so you can download it!

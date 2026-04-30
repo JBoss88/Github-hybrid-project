@@ -23,7 +23,7 @@ class LoginPage(BasePage):
         print(f"UI Action: Starting login flow for user '{username}'...")
         
         # 1. Navigate directly to the login screen
-        self.navigate("https://github.com/login")
+        self.navigate("https://github.com")
         
         # 2. Wait for the page to load by ensuring the username box is visible
         self.wait_for_visible(self.username_input)

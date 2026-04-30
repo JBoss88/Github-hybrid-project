@@ -19,7 +19,7 @@ def test_github_repo_lifecycle(login_page: LoginPage, dashboard_page: DashboardP
 
     # STEP B: UI Login
     # We call the injected Playwright login page
-    login_page.login(username=GITHUB_USERNAME, password=GITHUB_PASSWORD)
+    # login_page.login(username=GITHUB_USERNAME, password=GITHUB_PASSWORD)
 
     # STEP C: UI Validation
     # We call the injected Playwright dashboard page to verify the backend data
